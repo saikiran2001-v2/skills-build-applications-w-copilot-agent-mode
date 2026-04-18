@@ -14,10 +14,33 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+import os
+
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
+
+
+codespace_name = os.environ.get('CODESPACE_NAME')
+if codespace_name:
+    api_host = f"{codespace_name}-8000.app.github.dev"
+    api_scheme = 'https'
+    api_port = '443'
+else:
+    api_host = 'localhost:8000'
+    api_scheme = 'http'
+    api_port = '8000'
+
+
+def api_root(request, format=None):
+    request.META['HTTP_HOST'] = api_host
+    request.META['SERVER_NAME'] = api_host.split(':', 1)[0]
+    request.META['SERVER_PORT'] = api_port
+    request.META['wsgi.url_scheme'] = api_scheme
+    request.META['HTTP_X_FORWARDED_PROTO'] = api_scheme
+    request.__dict__.pop('_current_scheme_host', None)
+    return views.api_root(request, format=format)
 
 
 router = DefaultRouter()
@@ -29,6 +52,7 @@ router.register(r'leaderboard', views.LeaderboardViewSet, basename='leaderboard'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', api_root, name='api-root'),
     path('api/', include(router.urls)),
-    path('', views.api_root, name='api-root'),
+    path('', api_root),
 ]
