@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "npm install frontend",
+      "type": "shell",
+      "command": "npm install --prefix octofit-tracker/frontend",
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Start React Frontend",
+      "type": "shell",
+      "command": "HOST=0.0.0.0 npm start --prefix octofit-tracker/frontend",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Compiling...",
+          "endsPattern": "Compiled successfully"
+        }
+      }
+    }
+  ]
+}
